@@ -11,6 +11,7 @@ fs.readdir(directoryPath, (err, files) => {
 
   // Iterate over each file
   files.forEach((file) => {
+    if (file === ".gitkeep") return;
     const filePath = path.join(directoryPath, file);
     // Perform operations on the file
     readPDF(filePath);
@@ -28,11 +29,12 @@ function readPDF(pdfPath) {
       billData = data.text.split("\n").filter((d) => d);
     })
     .catch(function (error) {
-      console.error(error);
+      console.error(`pdf parsing error`, error);
     })
     .finally(function () {
-      //   console.log(">>>", billData);
-      //   process.exit();
+      if (!billData) {
+        console.log("skipping a failed bill")
+      }
       const dateTextLength = 11;
       const invoiceDigitsLength = 8;
       const elecReadingIndex =
@@ -71,8 +73,7 @@ function readPDF(pdfPath) {
       const addressIndex = billData.findIndex((d) => d.match(/Payable by/)) + 2;
       const apartment = billData[addressIndex];
 
-      console.log({
-        apartment,
+      const data = [apartment,
         date,
         invoice,
         elecConsumptionDate,
@@ -80,7 +81,13 @@ function readPDF(pdfPath) {
         elecReading,
         waterReading,
         elecCost,
-        waterCost,
-      });
+        waterCost
+      ];
+      
+      const [_, ...dataWithoutName] = data;
+      data.forEach(d => console.log(d))
+      console.log("---")
+      console.log("CSV data without app name:")
+      console.log(dataWithoutName.join(","))
     });
 }
