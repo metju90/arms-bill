@@ -84,10 +84,10 @@ function readPDF(pdfPath) {
         waterCost
       ];
       
-      const [_, ...dataWithoutName] = data;
+      const [appName, ...dataWithoutName] = data;
       data.forEach(d => console.log(d))
       console.log("---")
-      console.log("CSV data without app name:")
+      console.log(`CSV data for apartment ${appName}`)
       console.log(dataWithoutName.join(","))
     });
 }
