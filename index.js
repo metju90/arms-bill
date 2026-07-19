@@ -3,6 +3,8 @@ const PDFParser = require("pdf-parse");
 const path = require("path");
 
 const directoryPath = "./arms-bills";
+const final = [];
+console.log("Apartment,Date,Invoice,Elec Period,Water Period,Elec Reading,Water Reading,Elec Cost,Water Cost");
 fs.readdir(directoryPath, (err, files) => {
   if (err) {
     console.error("Error reading directory:", err);
@@ -11,7 +13,7 @@ fs.readdir(directoryPath, (err, files) => {
 
   // Iterate over each file
   files.forEach((file) => {
-    if (file === ".gitkeep") return;
+    if (!file.endsWith(".pdf")) return;
     const filePath = path.join(directoryPath, file);
     // Perform operations on the file
     readPDF(filePath);
@@ -34,7 +36,10 @@ function readPDF(pdfPath) {
     .finally(function () {
       if (!billData) {
         console.log("skipping a failed bill")
+        return;
       }
+
+      try {
       const dateTextLength = 11;
       const invoiceDigitsLength = 8;
       const elecReadingIndex =
@@ -83,11 +88,9 @@ function readPDF(pdfPath) {
         elecCost,
         waterCost
       ];
-      
-      const [appName, ...dataWithoutName] = data;
-      data.forEach(d => console.log(d))
-      console.log("---")
-      console.log(`CSV data for apartment ${appName}`)
-      console.log(dataWithoutName.join(","))
+      console.log(data.join(","))
+    } catch (err) {
+      console.log("the file is  \n " +err)
+    }
     });
 }
